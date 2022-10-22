@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'kz.galamat'
-version = '0.0.1.afla'
+version = '0.0.1'
 sourceCompatibility = '17'
 
 configurations {
@@ -38,4 +38,38 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'convenient-rpc-client-rabbitmq'
+            from components.java
+            versionMapping {
+                usage('java-api') {
+                    fromResolutionOf('runtimeClasspath')
+                }
+                usage('java-runtime') {
+                    fromResolutionResult()
+                }
+            }
+            pom {
+                name = 'Convenient Rpc Client with Rabbitmq'
+                description = 'Convenient Rpc Client with Rabbitmq'
+                developers {
+                    developer {
+                        id = 'yersinKZ'
+                        name = 'Yersin Mukay'
+                        email = 'mukaiyersin@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHub-mvn-repo"
+            url = "file:///Users/yersinmukay/IdeaProjects/galamat-kz-mvn-repo"
+        }
+    }
 }
