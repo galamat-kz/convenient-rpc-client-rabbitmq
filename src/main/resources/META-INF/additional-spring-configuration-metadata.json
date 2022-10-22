@@ -1,8 +1,0 @@
-{
-  "properties": [
-    {
-      "name": "spring.rabbit.rpc.exchange",
-      "type": "java.lang.String",
-      "description": "The exchange of rabbitMQ."
-  }
-] }

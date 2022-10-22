@@ -2,10 +2,10 @@ package kz.galamat.rpc.convenient.client.rabbitmq.services;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kz.galamat.convenient.rpc.rabbitmq.settings.RpcProperties;
 import kz.galamat.rpc.convenient.RpcErrorResponse;
 import kz.galamat.rpc.convenient.RpcRequest;
 import kz.galamat.rpc.convenient.RpcResponseException;
-import kz.galamat.rpc.convenient.client.rabbitmq.configurations.RpcProperties;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.amqp.core.Message;
