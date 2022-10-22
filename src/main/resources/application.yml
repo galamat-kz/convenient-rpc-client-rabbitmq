@@ -1,0 +1,4 @@
+spring:
+  rabbit:
+    rpc:
+      exchange: rpc-exchange
