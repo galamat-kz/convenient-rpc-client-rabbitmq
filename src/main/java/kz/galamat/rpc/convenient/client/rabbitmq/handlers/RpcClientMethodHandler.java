@@ -1,6 +1,6 @@
 package kz.galamat.rpc.convenient.client.rabbitmq.handlers;
 
-import kz.galamat.rpc.convenient.RpcRequest;
+import kz.galamat.i.convenient.rpc.dtos.RpcRequest;
 import kz.galamat.rpc.convenient.client.rabbitmq.annotations.RpcClient;
 import kz.galamat.rpc.convenient.client.rabbitmq.services.RpcRequestService;
 import lombok.AllArgsConstructor;

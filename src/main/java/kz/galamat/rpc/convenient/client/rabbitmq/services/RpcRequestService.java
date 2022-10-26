@@ -3,15 +3,14 @@ package kz.galamat.rpc.convenient.client.rabbitmq.services;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kz.galamat.convenient.rpc.rabbitmq.settings.RpcProperties;
-import kz.galamat.rpc.convenient.RpcErrorResponse;
-import kz.galamat.rpc.convenient.RpcRequest;
-import kz.galamat.rpc.convenient.RpcResponseException;
+import kz.galamat.i.convenient.rpc.dtos.RpcErrorResponse;
+import kz.galamat.i.convenient.rpc.dtos.RpcRequest;
+import kz.galamat.i.convenient.rpc.exceptions.RpcResponseException;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.http.HttpStatus;
 
 /**
  * Created by Yersin Mukay on 21.10.2022
@@ -44,7 +43,7 @@ public class RpcRequestService {
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             return objectMapper.readValue(result.getBody(), responseType);
         }
-        throw new RpcResponseException(HttpStatus.REQUEST_TIMEOUT.value(), HttpStatus.REQUEST_TIMEOUT.getReasonPhrase());
+        throw new RpcResponseException(408, "Request Timeout");
     }
 
 }
