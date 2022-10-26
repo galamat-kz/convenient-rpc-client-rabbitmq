@@ -1,4 +1,4 @@
-package kz.galamat.rpc.convenient.client.rabbitmq.services;
+package kz.galamat.convenient.rpc.client.rabbitmq.services;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;

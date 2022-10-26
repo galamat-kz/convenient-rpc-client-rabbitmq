@@ -1,8 +1,8 @@
-package kz.galamat.rpc.convenient.client.rabbitmq.handlers;
+package kz.galamat.convenient.rpc.client.rabbitmq.handlers;
 
+import kz.galamat.convenient.rpc.client.rabbitmq.annotations.RpcClient;
 import kz.galamat.i.convenient.rpc.dtos.RpcRequest;
-import kz.galamat.rpc.convenient.client.rabbitmq.annotations.RpcClient;
-import kz.galamat.rpc.convenient.client.rabbitmq.services.RpcRequestService;
+import kz.galamat.convenient.rpc.client.rabbitmq.services.RpcRequestService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.core.annotation.MergedAnnotation;

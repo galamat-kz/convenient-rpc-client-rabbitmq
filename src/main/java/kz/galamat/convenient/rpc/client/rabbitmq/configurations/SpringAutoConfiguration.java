@@ -1,8 +1,8 @@
-package kz.galamat.rpc.convenient.client.rabbitmq.configurations;
+package kz.galamat.convenient.rpc.client.rabbitmq.configurations;
 
+import kz.galamat.convenient.rpc.client.rabbitmq.handlers.RpcClientMethodHandler;
 import kz.galamat.convenient.rpc.rabbitmq.settings.RpcProperties;
-import kz.galamat.rpc.convenient.client.rabbitmq.handlers.RpcClientMethodHandler;
-import kz.galamat.rpc.convenient.client.rabbitmq.services.RpcRequestService;
+import kz.galamat.convenient.rpc.client.rabbitmq.services.RpcRequestService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package kz.galamat.rpc.convenient.client.rabbitmq.annotations;
+package kz.galamat.convenient.rpc.client.rabbitmq.annotations;
 
 import org.springframework.stereotype.Service;
 import org.thepavel.icomponent.Handler;

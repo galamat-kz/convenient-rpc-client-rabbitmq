@@ -1,6 +1,6 @@
-package kz.galamat.rpc.convenient.client.rabbitmq.annotations;
+package kz.galamat.convenient.rpc.client.rabbitmq.annotations;
 
-import kz.galamat.rpc.convenient.client.rabbitmq.configurations.RpcClientMarkerConfiguration;
+import kz.galamat.convenient.rpc.client.rabbitmq.configurations.RpcClientMarkerConfiguration;
 import org.springframework.context.annotation.Import;
 import org.thepavel.icomponent.InterfaceComponentScan;
 
