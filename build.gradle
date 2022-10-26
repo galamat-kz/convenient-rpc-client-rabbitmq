@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'kz.galamat'
-version = '0.0.1'
+version = '0.0.5'
 sourceCompatibility = '17'
 
 configurations {
@@ -23,11 +23,12 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework:spring-webmvc:5.3.23'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-amqp'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4.2'
     implementation 'org.thepavel:spring-icomponent:1.1.0'
-    implementation 'kz.galamat:convenient-rpc-interface:0.0.3'
+    implementation 'kz.galamat:convenient-rpc-interface:0.0.6'
     implementation 'kz.galamat:convenient-rpc-rabbitmq-settings:0.0.3'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
