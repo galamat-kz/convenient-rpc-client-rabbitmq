@@ -18,8 +18,13 @@ import java.lang.annotation.Target;
 public @interface RpcClient {
 
     /**
-     * The name of the server's queue.
+     * The name of the bean.
      */
     String value() default "";
+
+    /**
+     * The name of the target queue.
+     */
+    String queue() default "";
 
 }
