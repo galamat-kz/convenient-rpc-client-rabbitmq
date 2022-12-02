@@ -1,8 +1,8 @@
 package kz.galamat.convenient.rpc.client.rabbitmq.handlers;
 
 import kz.galamat.convenient.rpc.client.rabbitmq.annotations.RpcClient;
-import kz.galamat.i.convenient.rpc.dtos.RpcRequest;
 import kz.galamat.convenient.rpc.client.rabbitmq.services.RpcRequestService;
+import kz.galamat.i.convenient.rpc.dtos.RpcRequest;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.core.annotation.MergedAnnotation;
@@ -31,6 +31,7 @@ public class RpcClientMethodHandler implements MethodHandler {
         final MergedAnnotation<RequestMapping> requestMapping = methodMetadata.getAnnotations().get(RequestMapping.class);
         final List<ParameterMetadata> parametersMetadata = methodMetadata.getParametersMetadata();
         final Map<String, List<String>> queryParams = new HashMap<>();
+        final Map<String, List<String>> headers = new HashMap<>();
         final Map<String, String> pathVariables = new HashMap<>();
         Object requestBody = null;
         for (int i = 0; i < parametersMetadata.size(); i++) {
@@ -45,6 +46,11 @@ public class RpcClientMethodHandler implements MethodHandler {
                 queryParams.putIfAbsent(parameterName, new ArrayList<>());
                 final var listOfValues = queryParams.get(parameterName);
                 listOfValues.add(parameterValue.toString());
+            } else if (parameterAnnotations.isPresent(RequestHeader.class)) {
+                final String parameterName = parameterAnnotations.get(RequestHeader.class).getString(VALUE_ATTR);
+                headers.putIfAbsent(parameterName, new ArrayList<>());
+                final var listOfValues = headers.get(parameterName);
+                listOfValues.add(parameterValue.toString());
             } else if (parameterAnnotations.isPresent(PathVariable.class)) {
                 final String parameterName = parameterAnnotations.get(PathVariable.class).getString(VALUE_ATTR);
                 pathVariables.put("{" + parameterName + "}", parameterValue.toString());
@@ -56,6 +62,7 @@ public class RpcClientMethodHandler implements MethodHandler {
         final var rpcRequest = RpcRequest.builder()
                 .path(buildPath(pathPattern, pathVariables))
                 .method(requestMethod.name())
+                .headers(headers)
                 .queryParams(queryParams)
                 .body(requestBody)
                 .build();
