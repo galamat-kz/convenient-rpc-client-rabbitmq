@@ -84,7 +84,7 @@ public class RpcClientMethodHandler implements MethodHandler {
 
     private String getQueueName(MethodMetadata methodMetadata) {
         return methodMetadata.getSourceClassMetadata()
-                .getSourceClass().getAnnotation(RpcClient.class).value();
+                .getSourceClass().getAnnotation(RpcClient.class).queue();
     }
 
 }
