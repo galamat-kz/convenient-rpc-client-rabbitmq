@@ -3,7 +3,7 @@
 Convenient RPC is a Java to async client binder inspired by [OpenFeign](https://github.com/OpenFeign/feign). Convenient's first goal was reducing the complexity of RPC call.
 
 ---
-### How does Feign work?
+### How does Convenient RPC client work?
 
 Convenient RPC client works by processing annotations into a templatized request. Arguments are applied to these templates in a straightforward fashion before output.  
 
@@ -23,157 +23,41 @@ repositories {
 
 dependencies {
     ...
-    implementation 'kz.galamat:spring-boot-starter-rabbit-rpc-to-request-dispatcher:0.0.4'
+    implementation 'kz.galamat:convenient-rpc-client-rabbitmq:0.0.12'
+    implementation 'kz.galamat:convenient-rpc-interface:0.0.8'
     ...
 }
 ```
 ### application.yml
 ```
 spring:
-    rabbit:
-        rpc:
-            queue: user-service-queue
-            append-random-for-reply-queue-name: true
-            reply-queue-prefix: user-service-reply-queue
-            exchange: rpc-exchange
-            replyTimeout: 5000
-
-```
-
-## Spring Cloud Gateway
-If you using Spring Cloud Gateway you can easily add this filter and route to the service like this:
-### RpcFilter.java
-```
-@Component
-public class RpcFilter implements GlobalFilter {
-
-    private final Logger logger = LoggerFactory.getLogger(RpcFilter.class.getName());
-
-    public static final String ORIGINAL_PATH_HEADER_KEY = "Original-Path";
-    public static final String ORIGINAL_METHOD_HEADER_KEY = "Original-Method";
-    public static final String SERVICE_NAME_HEADER_KEY = "Service-Name";
-
-    private final ObjectProvider<DispatcherHandler> dispatcherHandlerProvider;
-
-    // do not use this dispatcherHandler directly, use getDispatcherHandler() instead.
-    private volatile DispatcherHandler dispatcherHandler;
-
-    public RpcFilter(
-            ObjectProvider<DispatcherHandler> dispatcherHandlerProvider) {
-        this.dispatcherHandlerProvider = dispatcherHandlerProvider;
-    }
-
-    private DispatcherHandler getDispatcherHandler() {
-        if (dispatcherHandler == null) {
-            dispatcherHandler = dispatcherHandlerProvider.getIfAvailable();
-        }
-
-        return dispatcherHandler;
-    }
-
-    @Override
-    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        Route route = exchange.getAttribute(GATEWAY_ROUTE_ATTR);
-        assert route != null;
-        URI routeUri = route.getUri();
-        String scheme = routeUri.getScheme();
-        if (isAlreadyRouted(exchange) || !"rpc".equals(scheme)) {
-            return chain.filter(exchange);
-        }
-
-        ServerHttpRequest request = exchange.getRequest();
-
-        ServerHttpRequest newRequest = request.mutate()
-                .path("/rpc")
-                .method(HttpMethod.POST)
-                .header(ORIGINAL_PATH_HEADER_KEY, request.getPath().value())
-                .header(ORIGINAL_METHOD_HEADER_KEY, request.getMethodValue())
-                .header(SERVICE_NAME_HEADER_KEY, route.getUri().getHost())
-                .build();
-
-        return Mono.just(exchange.mutate()
-                        .request(newRequest)
-                        .build())
-                .flatMap(webExchange -> this.getDispatcherHandler().handle(webExchange));
-    }
-
-}
-
-```
-### application.yml
-```
-spring:
+  application:
+    name: auth-service
+  convenient:
+    rpc:
+      rabbitmq:
+        queue: auth-service-queue
+        reply-queue-prefix: auth-service-reply-queue
+        exchange: rpc-exchange
+        replyTimeout: 2000
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
     publisher-confirm-type: correlated
     publisher-returns: true
-  cloud:
-    gateway:
-      routes:
-        - id: user-service
-          uri: rpc://user-service
-          predicates:
-            - Path=/users/**
-...
+
 ```
-### RpcController.java
+### RpcConfiguration.java
 ```
-@RestController
-@AllArgsConstructor
-@RequestMapping("/rpc")
-public class RpcController {
-
-    private final RabbitTemplate rabbitTemplate;
-    private final RpcConfigStorage rpcConfigStorage;
-
-    @SneakyThrows
-    @PostMapping
-    public Object post(HttpEntity<String> httpEntity,
-                       @RequestHeader(name = ORIGINAL_METHOD_HEADER_KEY) String originalMethod,
-                       @RequestHeader(name = ORIGINAL_PATH_HEADER_KEY) String originalPath,
-                       @RequestHeader(name = SERVICE_NAME_HEADER_KEY) String serviceName,
-                       @RequestParam MultiValueMap<String, String> queryParamsMV) {
-
-        Map<String, String[]> queryParams = queryParamsMV.entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        e -> e.getValue().toArray(new String[0])
-                ));
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        var dto = RpcRequestDto.builder()
-                .serviceName(serviceName)
-                .path(originalPath)
-                .method(originalMethod)
-                .queryParams(queryParams)
-                .build();
-        if (httpEntity.hasBody()) {
-            dto.setBody(objectMapper.readValue(httpEntity.getBody(), Object.class));
-        }
-        // Create a message subject
-        Message newMessage = MessageBuilder.withBody(objectMapper.writeValueAsBytes(dto)).build();
-        // The customer sends a message
-        Message result = rabbitTemplate.sendAndReceive(rpcConfigStorage.getRpcExchangeName(),
-                RpcUtil.getServiceQueue(serviceName), newMessage);
-        if (result != null) {
-            try {
-                RpcErrorResponseDto errorResponseDto = objectMapper.readValue(result.getBody(), RpcErrorResponseDto.class);
-                throw new ResponseStatusException(HttpStatus.valueOf(errorResponseDto.getStatus()),
-                        errorResponseDto.getMessage());
-            } catch (ResponseStatusException e) {
-                throw e;
-            }
-            catch (Exception ignored) {
-            }
-            return objectMapper.readValue(result.getBody(), Object.class);
-        }
-        throw new ResponseStatusException(HttpStatus.REQUEST_TIMEOUT, "Request timeout");
-    }
-    
+@ConditionalOnProperty(
+        prefix = "app.rpc", name = "enabled", havingValue = "true", matchIfMissing = true
+)
+@Configuration
+@EnableRpcServer
+@EnableRpcClient(basePackages = "path.to.base.package")
+public class RpcConfiguration {
 }
 
 ```
