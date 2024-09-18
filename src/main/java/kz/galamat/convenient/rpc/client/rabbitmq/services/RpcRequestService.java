@@ -12,6 +12,8 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * Created by Yersin Mukay on 21.10.2022
  */
@@ -30,11 +32,16 @@ public class RpcRequestService {
         final Message result = rabbitTemplate.sendAndReceive(rpcProperties.getExchange(), sendToQueue, newMessage);
         if (result != null) {
             RpcErrorResponse errorResponseDto = null;
-            try {
-                errorResponseDto = objectMapper.readValue(result.getBody(), RpcErrorResponse.class);
+
+            String responseBody = new String(result.getBody(), StandardCharsets.UTF_8);
+            if (!responseBody.trim().equals("{}")) {
+                try {
+                    errorResponseDto = objectMapper.readValue(responseBody, RpcErrorResponse.class);
+                }
+                catch (Exception ignored) {
+                }
             }
-            catch (Exception ignored) {
-            }
+
             if (errorResponseDto != null) {
                 throw new RpcResponseException(errorResponseDto.getError(), errorResponseDto.getStatus(),
                         errorResponseDto.getMessage());
