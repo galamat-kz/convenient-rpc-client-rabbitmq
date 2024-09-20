@@ -48,7 +48,7 @@ public class RpcRequestService {
             }
 
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            return objectMapper.readValue(result.getBody(), responseType);
+            return result.getBody() != null && result.getBody().length != 0 ? objectMapper.readValue(result.getBody(), responseType) : null;
         }
         throw new RpcResponseException(408, "Request Timeout");
     }
